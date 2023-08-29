@@ -51,7 +51,7 @@ class RecipeCategory(models.Model):
 
 class Recipe(models.Model):
     title = models.CharField(max_length=255, db_index=True)
-    code = models.IntegerField()
+    code = models.IntegerField(unique=True)
     category = models.ForeignKey(RecipeCategory, on_delete=models.PROTECT)
 
     def __str__(self):

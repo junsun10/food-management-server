@@ -29,7 +29,7 @@ class IngredientCategoryView(generics.ListCreateAPIView):
         permission_classes = [IsAuthenticated]
 
         if self.request.method == 'POST':
-            permission_classes = [IsAdminUser]
+            permission_classes.append(IsAdminUser)
 
         return [permission() for permission in permission_classes]
 
@@ -62,7 +62,7 @@ class IngredientView(generics.ListCreateAPIView):
         permission_classes = [IsAuthenticated]
 
         if self.request.method == 'POST':
-            permission_classes = [IsAdminUser]
+            permission_classes.append(IsAdminUser)
 
         return [permission() for permission in permission_classes]
 
@@ -136,3 +136,114 @@ class SingleCartView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Cart.objects.filter(user=user)
+
+
+# 설명: 레시피 카테고리 목록 조회, 레시피 카테고리 생성
+# 메소드: GET, POST
+# URL: /api/recipe-category
+class RecipeCategoryView(generics.ListCreateAPIView):
+    queryset = RecipeCategory.objects.all()
+    serializer_class = RecipeCategorySerializer
+
+    # 필터링 설정
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['title']
+    ordering_fields = ['id', 'title']
+    ordering = ['title']
+
+    # 레시피 카테고리 생성은 staff 권한 필요
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+
+        if self.request.method == 'POST':
+            permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]
+
+
+# 설명: 단일 레시피 카테고리 조회, 수정, 삭제
+# 메소드: GET, PUT, DELETE
+# URL: /api/recipe-category/<int:pk>
+class SingleRecipeCategoryView(generics.RetrieveUpdateDestroyAPIView):
+    # staff 권한 필요
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = RecipeCategory.objects.all()
+    serializer_class = RecipeCategorySerializer
+
+
+# 설명: 레시피 목록 조회, 레시피 생성
+# 메소드: GET, POST
+# URL: /api/recipe
+class RecipeView(generics.ListCreateAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+
+    # 필터링 설정
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['title', 'category__title']
+    ordering_fields = ['id', 'title']
+    ordering = ['title']
+
+    # 레시피 생성은 staff 권한 필요
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+
+        if self.request.method == 'POST':
+            permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]
+
+
+# 설명: 단일 레시피 조회, 수정, 삭제
+# 메소드: GET, PUT, DELETE
+# URL: /api/recipe/<int:pk>
+class SingleRecipeView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+
+        if self.request.method != 'GET':
+            permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]
+
+
+# 설명: 레시피 식재료 목록 조회, 레시피 식재료 생성
+# 메소드: GET, POST
+# URL: /api/recipe-ingredient
+class RecipeIngredientView(generics.ListCreateAPIView):
+    queryset = RecipeIngredient.objects.all()
+    serializer_class = RecipeIngredientSerializer
+
+    # 필터링 설정
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['recipe__title', 'ingredient__title']
+    ordering_fields = ['id', 'recipe__title', 'ingredient__title']
+    ordering = ['recipe__title', 'ingredient__title']
+
+    # 레시피 식재료 생성은 staff 권한 필요
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+
+        if self.request.method == 'POST':
+            permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]
+
+
+# 설명: 단일 레시피 식재료 조회, 수정, 삭제
+# 메소드: GET, PUT, DELETE
+# URL: /api/recipe-ingredient/<int:pk>
+class SingleRecipeIngredientView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = RecipeIngredient.objects.all()
+    serializer_class = RecipeIngredientSerializer
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+
+        if self.request.method != 'GET':
+            permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]

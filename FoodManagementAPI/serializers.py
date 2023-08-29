@@ -13,15 +13,18 @@ class UserSerializer(serializers.ModelSerializer):
 class IngredientCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = IngredientCategory
-        fields = ['id', 'title', 'slug']
+        fields = ['id', 'title']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     category = IngredientCategorySerializer(read_only=True)
 
+    category_id = serializers.PrimaryKeyRelatedField(
+        source='category', queryset=IngredientCategory.objects.all(), write_only=True)
+
     class Meta:
         model = Ingredient
-        fields = ['id', 'title', 'category']
+        fields = ['id', 'title', 'category', 'category_id']
 
 
 class UserIngredientSerializer(serializers.ModelSerializer):
@@ -40,15 +43,45 @@ class UserIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeCategorySerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = RecipeCategory
+        fields = ['id', 'title']
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    pass
+    category = RecipeCategorySerializer(read_only=True)
+
+    category_id = serializers.PrimaryKeyRelatedField(
+        source='category', queryset=RecipeCategory.objects.all(), write_only=True)
+
+    recipe_ingredients = serializers.SerializerMethodField(read_only=True)
+
+    def get_recipe_ingredients(self, obj):
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
+        serializer = RecipeIngredientSerializer(recipe_ingredients, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'code', 'title', 'category',
+                  'category_id', 'recipe_ingredients']
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    pass
+    recipe = serializers.SerializerMethodField(read_only=True)
+    ingredient = IngredientSerializer(read_only=True)
+
+    recipe_id = serializers.PrimaryKeyRelatedField(
+        source='recipe', queryset=Recipe.objects.all(), write_only=True)
+    ingredient_id = serializers.PrimaryKeyRelatedField(
+        source='ingredient', queryset=Ingredient.objects.all(), write_only=True)
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ['id', 'ingredient', 'recipe', 'recipe_id', 'ingredient_id']
+
+    def get_recipe(self, obj):
+        return {'id': obj.recipe.id, 'code': obj.recipe.code, 'title': obj.recipe.title, 'category': obj.recipe.category.title}
 
 
 class CartSerializer(serializers.ModelSerializer):
