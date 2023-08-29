@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 
+from unidecode import unidecode
+
 
 class IngredientCategory(models.Model):
     title = models.CharField(max_length=255, db_index=True)
@@ -11,7 +13,7 @@ class IngredientCategory(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
+        self.slug = slugify(unidecode(self.title), allow_unicode=True)
         super().save(*args, **kwargs)
 
 
@@ -28,6 +30,9 @@ class UserIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=5, decimal_places=1)
 
+    class Meta:
+        unique_together = ('user', 'ingredient')
+
     def __str__(self):
         return self.user.username + "_" + self.ingredient.title + "_" + str(self.quantity)
 
@@ -40,7 +45,7 @@ class RecipeCategory(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title, allow_unicode=True)
+        self.slug = slugify(unidecode(self.title), allow_unicode=True)
         super().save(*args, **kwargs)
 
 
