@@ -219,7 +219,7 @@ class RecipeIngredientView(generics.ListCreateAPIView):
 
     # 필터링 설정
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    search_fields = ['recipe__title', 'ingredient__title']
+    search_fields = ['recipe__title']
     ordering_fields = ['id', 'recipe__title', 'ingredient__title']
     ordering = ['recipe__title', 'ingredient__title']
 
@@ -229,6 +229,25 @@ class RecipeIngredientView(generics.ListCreateAPIView):
 
         if self.request.method == 'POST':
             permission_classes.append(IsAdminUser)
+
+        return [permission() for permission in permission_classes]
+
+
+# 설명: 해당 식재료가 포함된 레시피 목록 조회
+# 메소드: GET
+# URL: /api/ingredient-recipe
+class IngredientRecipeView(generics.ListAPIView):
+    queryset = RecipeIngredient.objects.all()
+    serializer_class = RecipeIngredientSerializer
+
+    # 필터링 설정
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['ingredient__title']
+    ordering_fields = ['id', 'recipe__title', 'ingredient__title']
+    ordering = ['recipe__title', 'ingredient__title']
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
 

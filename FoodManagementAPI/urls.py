@@ -24,4 +24,6 @@ urlpatterns = [
     path('recipe-ingredient', views.RecipeIngredientView.as_view()),
     path('recipe-ingredient/<int:pk>',
          views.SingleRecipeIngredientView.as_view()),
+
+    path('ingredient-recipe', views.IngredientRecipeView.as_view()),
 ]
