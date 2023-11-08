@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator, EmptyPage
 
 from rest_framework import generics, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.pagination import PageNumberPagination
 
 from .models import IngredientCategory, Ingredient, UserIngredient, RecipeCategory, Recipe, RecipeIngredient, Cart
 from .serializers import IngredientCategorySerializer, IngredientSerializer, UserIngredientSerializer, RecipeCategorySerializer, RecipeSerializer, RecipeIngredientSerializer, CartSerializer
@@ -184,6 +186,14 @@ class RecipeView(generics.ListCreateAPIView):
     ordering_fields = ['id', 'title']
     ordering = ['title']
 
+    # 페이지 설정
+    class RecipePagination(PageNumberPagination):
+        page_size = 10
+        page_size_query_param = 'page_size'
+        max_page_size = 20
+
+    pagination_class = RecipePagination
+
     # 레시피 생성은 staff 권한 필요
     def get_permissions(self):
         permission_classes = [IsAuthenticated]
@@ -245,6 +255,14 @@ class IngredientRecipeView(generics.ListAPIView):
     search_fields = ['ingredient__title']
     ordering_fields = ['id', 'recipe__title', 'ingredient__title']
     ordering = ['recipe__title', 'ingredient__title']
+
+    # 페이지 설정
+    class IngredientPagination(PageNumberPagination):
+        page_size = 10
+        page_size_query_param = 'page_size'
+        max_page_size = 20
+
+    pagination_class = IngredientPagination
 
     def get_permissions(self):
         permission_classes = [IsAuthenticated]
