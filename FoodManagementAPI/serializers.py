@@ -28,18 +28,16 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class UserIngredientSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     ingredient = IngredientSerializer(read_only=True)
 
-    user_id = serializers.PrimaryKeyRelatedField(
-        source='user', queryset=User.objects.all(), write_only=True)
     ingredient_id = serializers.PrimaryKeyRelatedField(
         source='ingredient', queryset=Ingredient.objects.all(), write_only=True)
 
     class Meta:
         model = UserIngredient
         fields = ['id', 'user', 'ingredient',
-                  'user_id', 'ingredient_id', 'quantity']
+                  'ingredient_id', 'quantity', 'start', 'end', 'memo']
 
 
 class RecipeCategorySerializer(serializers.ModelSerializer):
@@ -84,16 +82,28 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         return {'id': obj.recipe.id, 'code': obj.recipe.code, 'title': obj.recipe.title, 'category': obj.recipe.category.title}
 
 
+# class CartSerializer(serializers.ModelSerializer):
+#     user = UserSerializer(read_only=True)
+#     ingredient = IngredientSerializer(read_only=True)
+
+#     user_id = serializers.PrimaryKeyRelatedField(
+#         source='user', queryset=User.objects.all(), write_only=True)
+#     ingredient_id = serializers.PrimaryKeyRelatedField(
+#         source='ingredient', queryset=Ingredient.objects.all(), write_only=True)
+
+#     class Meta:
+#         model = Cart
+#         fields = ['id', 'user', 'ingredient',
+#                   'user_id', 'ingredient_id', 'buy']
+
+
 class CartSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     ingredient = IngredientSerializer(read_only=True)
 
-    user_id = serializers.PrimaryKeyRelatedField(
-        source='user', queryset=User.objects.all(), write_only=True)
     ingredient_id = serializers.PrimaryKeyRelatedField(
         source='ingredient', queryset=Ingredient.objects.all(), write_only=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'ingredient',
-                  'user_id', 'ingredient_id', 'buy']
+        fields = ['id', 'user', 'ingredient', 'ingredient_id', 'buy']
