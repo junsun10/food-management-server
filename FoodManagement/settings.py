@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'FoodManagementAPI',
     'rest_framework',
     # 'rest_framework.authtoken',
+    'django_filters',
     'djoser',
 ]
 
@@ -156,15 +157,20 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
     ],
 }
 
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': timedelta(days=1),
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+SIMPLE_JWT = {
+    # Access 토큰의 유효 시간 설정
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=int(os.getenv('ACCESS_TOKEN_LIFETIME'))),
+    # Refresh 토큰의 유효 시간 설정
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=int(os.getenv('SLIDING_TOKEN_REFRESH_LIFETIME'))),
+    # Refresh 토큰을 사용하여 새로운 Access 토큰을 발급하는 유효 시간 설정
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=int(os.getenv('SLIDING_TOKEN_LIFETIME'))),
+
 }
