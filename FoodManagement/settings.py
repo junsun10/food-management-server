@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # 'rest_framework.authtoken',
     'django_filters',
     'djoser',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'drf_yasg.middleware.SwaggerExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'FoodManagement.urls'
